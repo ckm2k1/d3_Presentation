@@ -1,0 +1,126 @@
+path {
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+line {
+    stroke: black;
+}
+
+text {
+    font-family: Arial;
+    font-size: 9pt;
+}
+
+<style>
+.chart {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.chart .background {
+  fill: none;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  fill: #fff;
+  font-size: 18px;
+}
+
+.axis.minor,
+.axis.minor text {
+  display: none;
+}
+
+.chart .bar,
+.chart .dot,
+.chart .line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.chart .bar,
+.chart .dot,
+.chart .area {
+  fill: #6baed6;
+}
+
+.join.chart path {
+  pointer-events: all;
+  -o-transition: fill-opacity 250ms linear;
+  -ms-transition: fill-opacity 250ms linear;
+  -moz-transition: fill-opacity 250ms linear;
+  -webkit-transition: fill-opacity 250ms linear;
+}
+
+.join.chart path:hover {
+  fill-opacity: 1 !important;
+}
+
+.color.palette {
+  position: relative;
+}
+
+.color.palette .label {
+  position: absolute;
+  line-height: 54px;
+  left: .4em;
+  color: #000;
+}
+
+.color.palette .swatch {
+  display: inline-block;
+  width: 54px;
+  height: 54px;
+}
+
+.ggplot {
+  background: #fff;
+  color: #000;
+}
+
+.ggplot .chart .area {
+  fill: #333333;
+}
+
+.ggplot .background {
+  fill: #ccc;
+}
+
+.ggplot .axis text {
+  fill: #000;
+}
+
+.ggplot .axis.minor {
+  display: block;
+}
+
+.ggplot .chart .line,
+.ggplot .axis path {
+  display: none;
+}
+
+.ggplot .axis.major line {
+  stroke: #000;
+}
+
+.ggplot .axis.minor line.minor {
+  stroke-opacity: .4;
+}
+
+.interpolate.chart circle {
+  fill: #fd8d3c;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+</style>

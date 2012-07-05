@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<title>D3.js - The Easy Way</title>
+<script src="highlight.pack.js"></script>
+<script>
+  hljs.tabReplace = '    ';
+  hljs.initHighlightingOnLoad();
+</script>
+<script src="d3-latest/d3.v2.js"></script>
+<script src='chart.js'></script>
+
+<!-- Fonts from big daddy google. -->
+<link href='http://fonts.googleapis.com/css?family=Oswald|Yanone+Kaffeesatz' rel='stylesheet'>
+<!-- Highlight.js color styles.  -->
+<link rel="stylesheet" href="css/arta.css">
+<link rel="stylesheet" href="css/main.css">
+
+<section>
+    <h1>D3.js - Data Driven SVG</h1>
+    <footer>by Steve Venzerul
+    <br>Credit: Mike Bostock - D3.js
+  </footer>
+</section>
+
+<section>
+  <style>
+    .redSpan { color: red;}
+    .blueSpan { color: blue;}
+    .greenSpan { color: green;}
+  </style>
+    <h3 style='text-align:center'>SVG Who? - <span class='redSpan'>Scalable<span> <span class='greenSpan'>Vector</span> <span class='blueSpan'>Graphics</span></h3>
+    <p>
+      <svg>
+        <style type="text/css">
+          circle:hover {fill-opacity:0.9;}
+        </style>
+        <g style="fill-opacity:0.7;">
+          <circle cx="10cm" cy="3cm" r="130" style="fill:red; stroke:black; stroke-width:0.1cm" transform="translate(0,45)" />
+          <circle cx="10cm" cy="3cm" r="130" style="fill:blue; stroke:black; stroke-width:0.1cm" transform="translate(100,190)" />
+          <circle cx="10cm" cy="3cm" r="130" style="fill:green; stroke:black; stroke-width:0.1cm" transform="translate(-100,190)"/>
+        </g>
+      </svg>
+    </p>
+    <details>Talk about how SVG is dynamic and scales to any resolution.
+      browsers are advancing massively so it's only a matter of time before hardware
+      solves our software problem.
+      SVG requires very little computing power with modern hardware.
+    </details>
+</section>
+
+<section>
+  <h3>Good ol' HTML and a dash of attributes</h3>
+  <pre>
+      <code class="html xml">
+        &lt;svg&gt;
+
+        &lt;style type="text/css"&gt;
+          circle:hover {fill-opacity:0.9;}
+        &lt;/style&gt;
+        &lt;circle cx="8.5cm" cy="2cm" r="60"
+        style="fill:red; stroke:black; stroke-width:0.1cm"
+        transform="translate(0,50)"&gt;
+
+        &lt;circle cx="8.5cm" cy="2cm" r="60"
+        style="fill:blue; stroke:black; stroke-width:0.1cm"
+        transform="translate(50,130)"&gt;
+
+        &lt;circle cx="8.5cm" cy="2cm" r="60"
+        style="fill:green; stroke:black; stroke-width:0.1cm"
+        transform="translate(-50,130)"&gt;
+
+        &lt;/svg&gt;
+      </code>
+  </pre>
+</section>
+
+<section>
+    <h3>What is D3.js?</h3>
+    <p>
+      D3 is a javascript library that was concieved to make stunning visualizations much simpler to create using
+      existing technology like HTML 5, CSS 3 and the SVG api.
+    </p>
+    <p>
+      <img src="imgs/logo.png" style="width:128px;height:128px;margin-left: 85px">
+      <img src='imgs/css3.png' style="width:128px;height:128px;margin-left: 85px">
+      <img src='imgs/SVG.jpg' style="width:128px;height:128px;margin-left: 85px">
+    </p>
+    <details>Talk about what data-driven means and how it can be applied to dynamic visualizations
+      and graphs. </details>
+</section>
+
+<section id='circles'>
+  <style>
+    .circle-section { fill: steelblue; stroke-width: 1px; stroke: black; }
+    </style>
+
+  <h3>The Basics - Pick me, Pick me!</h3>
+  <pre>
+    <code class='javascript'>
+      svg.selectAll("circle")
+      .data(data)
+    .enter().append("circle")
+      .attr("cx", x)
+      .attr("cy", y)
+      .attr("r", 2.5);
+    </code>
+  </pre>
+  <script src='circles.js'></script>
+  <details>Remember that d3 doesn't provide any methods to create multiple elements since it's all data-driven.
+          We want the circle selection to correspond to data.
+          The data method computes the enter and exit() subselections from the join.
+          The append method adds to parent node, in this case the SVG.
+          x,y are accessor functions that provide coordinates from the dataset.
+  </details>
+</section>
+
+<section>
+  <pre style='font-size: 16px'>
+    <code language='javascript'>
+      //local stylesheet for the circle elements.
+      &lt;style&gt;
+        .circle-section { fill: steelblue; stroke-width: 1px; stroke: black; }
+      &lt;/style&gt;
+      //Generate some random number data in range (2,25)
+      var data = (function() {
+        var c = [], i=0;
+        for (; i < 30; i++) {
+          c.push(Math.floor(2 + (Math.random() * 25)));
+        }
+        return c;
+      })();
+      var h = 300, w = 960;
+
+      //These are accessor function which will dynamically generate the coordinates
+      //for drawing the circles based on the width and height of the SVG.
+      //The coordinates fall within the range (10, ((w|h)-25))
+      var x = function() { return Math.floor(Math.random() * (w-25)) + 25; };
+      var y = function() { return Math.floor(Math.random() * (h+25)) - 25; };
+
+      //configure the SVG.
+      var svg = d3.select('#circles')
+                  .append('svg')
+                  .attr('width', w)
+                  .attr('height', h);
+
+      //Bind the data and set attribs
+      svg.selectAll('circles')
+          .data(data)
+        .enter().append('circle')
+          .attr('cx', x)
+          .attr('cy', y)
+          .attr('r', function(d) { return d;  })
+          .attr('class', 'circle-section')
+          .attr('opacity', function() { return Math.random() + 0.15; });
+    </code>
+  </pre>
+  <details>The data method is the most important part here. It computes the data join and then
+    creates subselections called enter(), update() and exit(). Enter is all new data which does not
+    have a corresponding element yet. Update is new data for existing elements. Exit is for elements
+    that had no update data to be removed. Normally call selection.remove().
+    Without keys though, we cannot main object consistency for animating changes in data.
+  </details>
+</section>
+
+<section id='key-functions'>
+  <h3>Where your keys at?</h3>
+  <p>
+    In the last example the graph was static. We could apply animations to it,
+    but we would have to replace the data entirely with new values and recompute the graph.
+    What if we wanted to maintain the same elements and animate their change to a new
+    position?
+    Enter the key function:
+  </p>
+  <pre>
+    <code class='javascript'>
+  //We add a name field to serve as a key for this data.
+  var data = [
+    {name: "Alice", x: 10.0, y: 9.14},
+    {name:   "Bob", x:  8.0, y: 8.14},
+    {name: "Carol", x: 13.0, y: 8.74},
+    {name:  "Dave", x:  9.0, y: 8.77},
+    {name: "Edith", x: 11.0, y: 9.26}
+  ];
+</code>
+</pre>
+</section>
+
+<section>
+  <pre>
+    <code>
+      function key(d) { return d.name; }
+      function x(d) { return d.x; }
+      function y(d) { return d.y; }
+
+      var circle = svg.selectAll("circle")
+        .data(data, key)
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("r", 2.5);
+    </code>
+  </pre>
+  <p>
+    Now, when we update the data we can easily animate the change in element values.
+    But we'll get to that in a bit.
+  </p>
+</section>
+
+<section>
+  <h3>Scaling Scales</h3>
+  <p>Say we wanted to map some values to the size of our graph, we might do something like this:</p>
+  <pre>
+    <code class='javascript'>
+      function x(d) { return d * 42 + "px"; }
+  </code>
+  </pre>
+  <p>Doesn't look like much fun and we're hard-coding the scale factor. Not cool!</p>
+  <pre>
+  <code class='javascipt'>
+      var x = d3.scale.linear()
+        .domain([12, 24])
+        .range([0, 720]);
+      x(16); // 240
+  </code>
+</section>
+
+<section>
+  <p>What if we wanted a different scale, say a logarithmic one?
+  No Problem!</p>
+  <pre>
+    <code class='javascript'>
+      var x = d3.scale.log()
+      .domain(d3.extent(numbers))
+      .range([0, 720]);
+    </code>
+  </pre>
+  <p>We can even get D3 to compute the min and max of our data using the .extent() function.
+    Need to access a numeric value from an object? Still no problem!
+  </p>
+  <pre>
+    <code class='javascript'>
+      function value(d) { return d.value; }
+
+      var x = d3.scale.log()
+      .domain(d3.extent(objects, value))
+      .range([0, 720]);
+    </code>
+  <pre>
+    <details>Talk about ordinal scales that map values from one set to another.</details>
+</section>
+
+<section>
+  <h3>Interpolations - Sounds Like Something Complicated</h3>
+  <p>Interpolation simply means changing one value to another
+    through a constant scale. The start and end values don't have to be numeric.
+    This lets us generate scales that are mapped to values which can then be mapped
+    to groups or categories of data.
+  </p>
+  <pre>
+    <code class='javascript'>
+      var x = d3.scale.linear()
+      .domain([12, 24])
+      .range(["steelblue", "brown"]);
+
+    x(16); // #666586
+  </code>
+  </pre>
+</section>
+
+<section>
+  <h3>And My Axes!!!</h3>
+  <p>Now that we know some scales we can have a look at how to draw axes (not the dwarf kind) for our graphs.</p>
+  <pre>
+    <code class='javascript'>
+      var y = d3.scale.linear()
+          .domain([0, 45])
+          .range([0, 410]);
+
+      var x = d3.scale.linear()
+          .domain([0, 45])
+          .range([0, 410]);
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("top");
+    </code>
+  </pre>
+</section>
+
+<section>
+  <p>Now that we have our scales all that's left is generating the axes</p>
+<pre>
+  <code class='javascript'>
+        svg.append("g")
+            .attr("transform", "translate(100 40)")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        svg.append("g")
+            .attr("transform", "translate(100 40)")
+            .attr("class", "x axis")
+            .call(xAxis);
+    </code>
+  </pre>
+</section>
+
+<section id='axis'>
+  <h3>Axes, they're sharp</h3>
+    <style>
+    .axis path, .axis line {
+      fill: none;
+      stroke: steelblue;
+      shape-rendering: crispEdges;
+    }
+    </style>
+    <script src='axis.js'></script>
+</section>
+
+
+<section>
+  <h2>But what about some data?</h2>
+</section>
+
+<section id='dot-chart'>
+  <h3 style='position:absolute;left:150px;'>Bouyah!</h3>
+  <script src='chart.js'></script>
+  <script>
+    d3.select("#dot-chart").datum([
+      {x: 10.0, y: 9.14},
+      {x:  8.0, y: 8.14},
+      {x: 13.0, y: 8.74},
+      {x:  9.0, y: 8.77},
+      {x: 11.0, y: 9.26},
+      {x: 14.0, y: 8.10},
+      {x:  6.0, y: 6.13},
+      {x:  4.0, y: 3.10},
+      {x: 12.0, y: 9.13},
+      {x:  7.0, y: 7.26},
+      {x:  5.0, y: 4.74},
+    ]).call(full_chart());
+  </script>
+</section>
+
+<section>
+  <pre>
+    <code class='javascript'>
+function chart(selection) {
+  selection.each(function(d) {
+    //pad simply adds it's second paramter to the domain
+    //of x and y who are scale.linear() functions.
+    pad(x.domain(d3.extent(d, xValue)), 40);
+    pad(y.domain(d3.extent(d, yValue)), 40);
+
+    //Initilize the svg and transform it's cooridante
+    //system by the margin defined earlier.
+    var svg = d3.select(this).append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("class", "dot chart")
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    //draw the circles onto the svg using the x and y scales defined earlier.
+    //This has the convenience that the scales will put all the circles into the
+    //correct positions automagically.
+    svg.selectAll(".dot")
+        .data(d)
+      .enter().append("circle")
+        .attr("class", "dot")
+        .attr("cx", function(d) { return x(d.x); })
+        .attr("cy", function(d) { return y(d.y); })
+        .attr("r", 12);
+    </code>
+  </pre>
+</section>
+
+<section>
+  <pre>
+    <code class='javascript'>
+    //Create the axes and translate them into position.
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + y.range()[0] + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+  });
+}
+    </code>
+  </pre>
+  <details>The g element lets us group shapes into a container and apply transformation like
+    translate and rotate to them. </details>
+</section>
+
+
+<section>
+  <h3>So what's left?</h3>
+  <p>Animations of course! Where would any visualization library be without the awesome transformations and easing functions?</p>
+</section>
+
+<section id='key-animation'>
+  <h3 style='position:absolute; z-index: 9999;'>Animate all the things!</h3>
+  <script src='key-functions.js'></script>
+</section>
+
+<section>
+  <h3>Animashun - How is it made?</h3>
+  <pre>
+    <code class='javascript'>
+      var key_function = (function() {
+
+      /*****Random data generator goes here****/
+
+      var h = 720, w = 960;
+
+      var x = function() { return Math.floor(Math.random() * (w-50)) + 25; };
+      var y = function() { return Math.floor(Math.random() * (h-60)) + 25; };
+
+      //configure the SVG.
+      var svg = d3.select('#key-animation')
+                  .append('svg')
+                  .attr('width', w)
+                  .attr('height', h);
+</code>
+</pre>
+</section>
+
+<section>
+  <pre>
+    <code class='javascript'>
+var circles = svg.selectAll('circle')
+    .data(d)
+  .enter()
+  .append('circle')
+    .attr('cx', x)
+    .attr('cy', y)
+    .attr('r', function(d) { return d; })
+    .attr('class', 'circle-section')
+    .attr('opacity', function() { return Math.random() + 0.15; })
+
+function animateTransition(d) {
+  for(var i=0; i < d.length; i++) {
+    d[i].rad = Math.floor((Math.random() * 25) + 5);
+  }
+  circles.data(d).transition()
+    .duration(2000)
+    .delay(function(d, i) { return i * 10; })
+    .attr('cx', x)
+    .attr('cy', y)
+    .attr('r', function(d) { return d; })
+    .style('fill', function() { return '#'+Math.floor(Math.random()*16777215)
+                                          .toString(16); });
+  }
+return { 'svg' : svg, 'data' : d, 'at' : animateTransition };
+})();
+var inval = setInterval("key_function.at(key_function.data)", 2000);
+</code>
+</pre>
+</section>
+
+<style>
+  html { background-color: #929292; }
+  body { background-color: #2D2D2D; border-radius: 0px}
+  /* A section is a slide. It's size is 800x600, and this will never change */
+  section {
+      /* The fonts from Google */
+      font-family: 'Yanone Kaffeesatz', 'Oswald', arial, serif;
+      font-size: 30px;
+      color: white;
+  }
+  h1, h2 {
+    margin-top: 200px;
+    text-align: center;
+    font-size: 80px;
+  }
+  h3 {
+    font-size: 45px;
+    margin: 50px 0 30px 50px;
+  }
+
+  ul {
+      margin: 50px 200px;
+  }
+
+  p {
+    margin: 40px 75px;
+    font-size: 30px;
+  }
+
+  q {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    color: white;
+    font-size: 60px;
+    padding: 50px;
+  }
+ pre {
+  font-size: 20px;
+ }
+/*  img, video {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background-color: black;
+    z-index: -1;
+  }*/
+
+  footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 40px;
+    text-align: right;
+    background-color: #F3F4F8;
+    border-top: 1px solid #eee;
+    color: black;
+  }
+
+  /* Transition effect */
+  /* Feel free to change the transition effect for original
+     animations. See here:
+     https://developer.mozilla.org/en/CSS/CSS_transitions
+     How to use CSS3 Transitions: */
+  section {
+      -moz-transition: left 400ms linear 0s;
+      -webkit-transition: left 400ms linear 0s;
+      -ms-transition: left 400ms linear 0s;
+      transition: left 400ms linear 0s;
+  }
+
+  /* Before */
+  section { left: -150%; }
+  /* Now */
+  section[aria-selected] { left: 0; }
+  /* After */
+  section[aria-selected] ~ section { left: +150%; }
+
+  /* Incremental elements */
+
+  /* By default, visible */
+  .incremental > * { opacity: 1; }
+
+  /* The current item */
+  .incremental > *[aria-selected] { opacity: 1; }
+
+  /* The items to-be-selected */
+  .incremental > *[aria-selected] ~ * { opacity: 0; }
+
+  /* The progressbar, at the bottom of the slides, show the global
+     progress of the presentation. */
+  #progress-bar {
+    height: 2px;
+    background: #AAA;
+  }
+</style>
+
+<!-- {{{{ dzslides core
+#
+#
+#     __  __  __       .  __   ___  __
+#    |  \  / /__` |    | |  \ |__  /__`
+#    |__/ /_ .__/ |___ | |__/ |___ .__/ core :€
+#
+#
+# The following block of code is not supposed to be edited.
+# But if you want to change the behavior of these slides,
+# feel free to hack it!
+#
+-->
+
+<div id="progress-bar"></div>
+
+<!-- Default Style -->
+<style>
+  * { margin: 0; padding: 0; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+  details { display: none; }
+  body {
+    width: 960px; height: 720px;
+    margin-left: -480px; margin-top: -360px;
+    position: absolute; top: 50%; left: 50%;
+    /*margin-left: -600px; margin-top: -400px;*/
+    position: absolute;
+    left: 50%; top: 50%;
+    overflow: hidden;
+  }
+  section {
+    position: absolute;
+    pointer-events: none;
+    width: 100%; height: 100%;
+  }
+  section[aria-selected] { pointer-events: auto; }
+  html { overflow: hidden; }
+  body { display: none; }
+  body.loaded { display: block; }
+  .incremental {visibility: hidden; }
+  .incremental[active] {visibility: visible; }
+  #progress-bar{
+    bottom: 0;
+    position: absolute;
+    -moz-transition: width 400ms linear 0s;
+    -webkit-transition: width 400ms linear 0s;
+    -ms-transition: width 400ms linear 0s;
+    transition: width 400ms linear 0s;
+  }
+</style>
+
+<script>
+  var Dz = {
+    remoteWindows: [],
+    idx: -1,
+    step: 0,
+    slides: null,
+    progressBar : null,
+    params: {
+      autoplay: "1"
+    }
+  };
+
+  Dz.init = function() {
+    document.body.className = "loaded";
+    this.slides = $$("body > section");
+    this.progressBar = $("#progress-bar");
+    this.setupParams();
+    this.onhashchange();
+    this.setupTouchEvents();
+    this.onresize();
+  }
+
+  Dz.setupParams = function() {
+    var p = window.location.search.substr(1).split('&');
+    p.forEach(function(e, i, a) {
+      var keyVal = e.split('=');
+      Dz.params[keyVal[0]] = decodeURIComponent(keyVal[1]);
+    });
+  }
+
+  Dz.onkeydown = function(aEvent) {
+    // Don't intercept keyboard shortcuts
+    if (aEvent.altKey
+      || aEvent.ctrlKey
+      || aEvent.metaKey
+      || aEvent.shiftKey) {
+      return;
+    }
+    if ( aEvent.keyCode == 37 // left arrow
+      || aEvent.keyCode == 38 // up arrow
+      || aEvent.keyCode == 33 // page up
+    ) {
+      aEvent.preventDefault();
+      this.back();
+    }
+    if ( aEvent.keyCode == 39 // right arrow
+      || aEvent.keyCode == 40 // down arrow
+      || aEvent.keyCode == 34 // page down
+    ) {
+      aEvent.preventDefault();
+      this.forward();
+    }
+    if (aEvent.keyCode == 35) { // end
+      aEvent.preventDefault();
+      this.goEnd();
+    }
+    if (aEvent.keyCode == 36) { // home
+      aEvent.preventDefault();
+      this.goStart();
+    }
+    if (aEvent.keyCode == 32) { // space
+      aEvent.preventDefault();
+      this.toggleContent();
+    }
+    if (aEvent.keyCode == 70) { // f
+      aEvent.preventDefault();
+      this.goFullscreen();
+    }
+  }
+
+  /* Touch Events */
+
+  Dz.setupTouchEvents = function() {
+    var orgX, newX;
+    var tracking = false;
+
+    var db = document.body;
+    db.addEventListener("touchstart", start.bind(this), false);
+    db.addEventListener("touchmove", move.bind(this), false);
+
+    function start(aEvent) {
+      aEvent.preventDefault();
+      tracking = true;
+      orgX = aEvent.changedTouches[0].pageX;
+    }
+
+    function move(aEvent) {
+      if (!tracking) return;
+      newX = aEvent.changedTouches[0].pageX;
+      if (orgX - newX > 100) {
+        tracking = false;
+        this.forward();
+      } else {
+        if (orgX - newX < -100) {
+          tracking = false;
+          this.back();
+        }
+      }
+    }
+  }
+
+  /* Adapt the size of the slides to the window */
+
+  Dz.onresize = function() {
+    var db = document.body;
+    var sx = db.clientWidth / window.innerWidth;
+    var sy = db.clientHeight / window.innerHeight;
+    var transform = "scale(" + (1/Math.max(sx, sy)) + ")";
+
+    db.style.MozTransform = transform;
+    db.style.WebkitTransform = transform;
+    db.style.OTransform = transform;
+    db.style.msTransform = transform;
+    db.style.transform = transform;
+  }
+
+
+  Dz.getDetails = function(aIdx) {
+    var s = $("section:nth-of-type(" + aIdx + ")");
+    var d = s.$("details");
+    return d ? d.innerHTML : "";
+  }
+
+  Dz.onmessage = function(aEvent) {
+    var argv = aEvent.data.split(" "), argc = argv.length;
+    argv.forEach(function(e, i, a) { a[i] = decodeURIComponent(e) });
+    var win = aEvent.source;
+    if (argv[0] === "REGISTER" && argc === 1) {
+      this.remoteWindows.push(win);
+      this.postMsg(win, "REGISTERED", document.title, this.slides.length);
+      this.postMsg(win, "CURSOR", this.idx + "." + this.step);
+      return;
+    }
+    if (argv[0] === "BACK" && argc === 1)
+      this.back();
+    if (argv[0] === "FORWARD" && argc === 1)
+      this.forward();
+    if (argv[0] === "START" && argc === 1)
+      this.goStart();
+    if (argv[0] === "END" && argc === 1)
+      this.goEnd();
+    if (argv[0] === "TOGGLE_CONTENT" && argc === 1)
+      this.toggleContent();
+    if (argv[0] === "SET_CURSOR" && argc === 2)
+      window.location.hash = "#" + argv[1];
+    if (argv[0] === "GET_CURSOR" && argc === 1)
+      this.postMsg(win, "CURSOR", this.idx + "." + this.step);
+    if (argv[0] === "GET_NOTES" && argc === 1)
+      this.postMsg(win, "NOTES", this.getDetails(this.idx));
+  }
+
+  Dz.toggleContent = function() {
+    // If a Video is present in this new slide, play it.
+    // If a Video is present in the previous slide, stop it.
+    var s = $("section[aria-selected]");
+    if (s) {
+      var video = s.$("video");
+      if (video) {
+        if (video.ended || video.paused) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      }
+    }
+  }
+
+  Dz.setCursor = function(aIdx, aStep) {
+    // If the user change the slide number in the URL bar, jump
+    // to this slide.
+    aStep = (aStep != 0 && typeof aStep !== "undefined") ? "." + aStep : ".0";
+    window.location.hash = "#" + aIdx + aStep;
+  }
+
+  Dz.onhashchange = function() {
+    var cursor = window.location.hash.split("#"),
+        newidx = 1,
+        newstep = 0;
+    if (cursor.length == 2) {
+      newidx = ~~cursor[1].split(".")[0];
+      newstep = ~~cursor[1].split(".")[1];
+      if (newstep > Dz.slides[newidx - 1].$$('.incremental > *').length) {
+        newstep = 0;
+        newidx++;
+      }
+    }
+    this.setProgress(newidx, newstep);
+    if (newidx != this.idx) {
+      this.setSlide(newidx);
+    }
+    if (newstep != this.step) {
+      this.setIncremental(newstep);
+    }
+    for (var i = 0; i < this.remoteWindows.length; i++) {
+      this.postMsg(this.remoteWindows[i], "CURSOR", this.idx + "." + this.step);
+    }
+  }
+
+  Dz.back = function() {
+    if (this.idx == 1 && this.step == 0) {
+      return;
+    }
+    if (this.step == 0) {
+      this.setCursor(this.idx - 1,
+                     this.slides[this.idx - 2].$$('.incremental > *').length);
+    } else {
+      this.setCursor(this.idx, this.step - 1);
+    }
+  }
+
+  Dz.forward = function() {
+    if (this.idx >= this.slides.length &&
+        this.step >= this.slides[this.idx - 1].$$('.incremental > *').length) {
+        return;
+    }
+    if (this.step >= this.slides[this.idx - 1].$$('.incremental > *').length) {
+      this.setCursor(this.idx + 1, 0);
+    } else {
+      this.setCursor(this.idx, this.step + 1);
+    }
+  }
+
+  Dz.goStart = function() {
+    this.setCursor(1, 0);
+  }
+
+  Dz.goEnd = function() {
+    var lastIdx = this.slides.length;
+    var lastStep = this.slides[lastIdx - 1].$$('.incremental > *').length;
+    this.setCursor(lastIdx, lastStep);
+  }
+
+  Dz.setSlide = function(aIdx) {
+    this.idx = aIdx;
+    var old = $("section[aria-selected]");
+    var next = $("section:nth-of-type("+ this.idx +")");
+    if (old) {
+      old.removeAttribute("aria-selected");
+      var video = old.$("video");
+      if (video) {
+        video.pause();
+      }
+    }
+    if (next) {
+      next.setAttribute("aria-selected", "true");
+      var video = next.$("video");
+      if (video && !!+this.params.autoplay) {
+        video.play();
+      }
+    } else {
+      // That should not happen
+      this.idx = -1;
+      // console.warn("Slide doesn't exist.");
+    }
+  }
+
+  Dz.setIncremental = function(aStep) {
+    this.step = aStep;
+    var old = this.slides[this.idx - 1].$('.incremental > *[aria-selected]');
+    if (old) {
+      old.removeAttribute('aria-selected');
+    }
+    var incrementals = $$('.incremental');
+    if (this.step <= 0) {
+      $$.forEach(incrementals, function(aNode) {
+        aNode.removeAttribute('active');
+      });
+      return;
+    }
+    var next = this.slides[this.idx - 1].$$('.incremental > *')[this.step - 1];
+    if (next) {
+      next.setAttribute('aria-selected', true);
+      next.parentNode.setAttribute('active', true);
+      var found = false;
+      $$.forEach(incrementals, function(aNode) {
+        if (aNode != next.parentNode)
+          if (found)
+            aNode.removeAttribute('active');
+          else
+            aNode.setAttribute('active', true);
+        else
+          found = true;
+      });
+    } else {
+      setCursor(this.idx, 0);
+    }
+    return next;
+  }
+
+  Dz.goFullscreen = function() {
+    var html = $('html'),
+        requestFullscreen = html.requestFullscreen || html.requestFullScreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
+    if (requestFullscreen) {
+      requestFullscreen.apply(html);
+    }
+  }
+
+  Dz.setProgress = function(aIdx, aStep) {
+    var slide = $("section:nth-of-type("+ aIdx +")");
+    if (!slide)
+      return;
+    var steps = slide.$$('.incremental > *').length + 1,
+        slideSize = 100 / (this.slides.length - 1),
+        stepSize = slideSize / steps;
+    this.progressBar.style.width = ((aIdx - 1) * slideSize + aStep * stepSize) + '%';
+  }
+
+  Dz.postMsg = function(aWin, aMsg) { // [arg0, [arg1...]]
+    aMsg = [aMsg];
+    for (var i = 2; i < arguments.length; i++)
+      aMsg.push(encodeURIComponent(arguments[i]));
+    aWin.postMessage(aMsg.join(" "), "*");
+  }
+
+  function init() {
+    Dz.init();
+    window.onkeydown = Dz.onkeydown.bind(Dz);
+    window.onresize = Dz.onresize.bind(Dz);
+    window.onhashchange = Dz.onhashchange.bind(Dz);
+    window.onmessage = Dz.onmessage.bind(Dz);
+  }
+
+  window.onload = init;
+</script>
+
+
+<script> // Helpers
+  if (!Function.prototype.bind) {
+    Function.prototype.bind = function (oThis) {
+
+      // closest thing possible to the ECMAScript 5 internal IsCallable
+      // function
+      if (typeof this !== "function")
+      throw new TypeError(
+        "Function.prototype.bind - what is trying to be fBound is not callable"
+      );
+
+      var aArgs = Array.prototype.slice.call(arguments, 1),
+          fToBind = this,
+          fNOP = function () {},
+          fBound = function () {
+            return fToBind.apply( this instanceof fNOP ? this : oThis || window,
+                   aArgs.concat(Array.prototype.slice.call(arguments)));
+          };
+
+      fNOP.prototype = this.prototype;
+      fBound.prototype = new fNOP();
+
+      return fBound;
+    };
+  }
+
+  var $ = (HTMLElement.prototype.$ = function(aQuery) {
+    return this.querySelector(aQuery);
+  }).bind(document);
+
+  var $$ = (HTMLElement.prototype.$$ = function(aQuery) {
+    return this.querySelectorAll(aQuery);
+  }).bind(document);
+
+  $$.forEach = function(nodeList, fun) {
+    Array.prototype.forEach.call(nodeList, fun);
+  }
+
+</script>
+<!-- vim: set fdm=marker: }}} -->
